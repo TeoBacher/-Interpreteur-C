@@ -1,20 +1,8 @@
 #include <stdio.h>
 #include <ctype.h>  
 #include <string.h> 
+#include <lexer.h>
 
-typedef enum {
-    Number,        // 0-9
-    Identifier,    // a-z, A-Z
-    Assign = 128,  // '=' 
-    Add,           // '+' 
-    Sub,           // '-' 
-    Mul,           // '*' 
-    Div,           // '/' 
-    Mod,           // '%' 
-    Inc,           // '++' 
-    Dec,           // '--' 
-    Error = 129,   // Print error
-}TokenType;
 
 
 typedef struct {
@@ -26,7 +14,7 @@ char* input;
 int position = 0;
 
 // Function that creates the token
-Token create_token(TokenType type, const char* value) {
+Token createToken(TokenType type, const char* value) {
     Token token;
     token.type = type;
     strncpy(token.value, value, 255);
@@ -69,7 +57,7 @@ Token getNextToken(){
                 advance();
             }
             number[i] = '\0';
-            return create_token(Number, number);
+            return createToken(Number, number);
         }
 
         // Check if the current character is an identifier
@@ -81,7 +69,7 @@ Token getNextToken(){
                 advance();
             }
             id[i] = '\0';
-            return create_token(Identifier, id);
+            return createToken(Identifier, id);
         }
 
         // check for +, ++, *, /, %, =, -, --
@@ -89,7 +77,7 @@ Token getNextToken(){
         {
         case '=':
             advance();
-            return create_token(Assign, "+");
+            return createToken(Assign, "=");
 
         case '+':
             while (peek() == '+')
@@ -98,15 +86,15 @@ Token getNextToken(){
                 plusCounter++;
                 if (plusCounter > 2)
                 {   
-                    return create_token(Error, "Syntax error");
+                    return createToken(Error, "Syntax error");
                 }
             }
  
-            return create_token(Assign, "+");
+            return createToken(Assign, "+");
         
             if (plusCounter == 2)
             {
-               return create_token(Dec, "++");
+               return createToken(Dec, "++");
             }
 
         case '-':
@@ -116,31 +104,42 @@ Token getNextToken(){
                 minusCounter++;
                 if (minusCounter > 2)
                 {
-                    return create_token(Error, "Syntax error");
+                    return createToken(Error, "Syntax error");
                 }
             }
-            return create_token(Assign, "-");
+            return createToken(Assign, "-");
 
             if (minusCounter == 2)
             {
-                return create_token(Dec, "--");
+                return createToken(Dec, "--");
             }
 
         case '*':
             advance();
-            return create_token(Mul, "*");
+            return createToken(Mul, "*");
 
         case '/':
             advance();
-            return create_token(Div, "/");
+            return createToken(Div, "/");
 
         case '%':
             advance();
-            return create_token(Mod, "%");
+            return createToken(Mod, "%");
 
         default:
-            return create_token(Error, "Syntax error or unknown character");
+            return createToken(Error, "Syntax error or unknown character");
         }   
     }
-    
+    return createToken(Eof, "");
+}
+
+int main() {
+    input = "x = 3 + 4 * 2";
+    Token token;
+    do {
+        token = getNextToken();
+        printf("Token: Type = %d, Valeur = %s\n", token.type, token.value);
+    } while (token.type != Eof);
+
+    return 0;
 }
