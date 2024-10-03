@@ -13,6 +13,7 @@ typedef enum {
     Mod,           // '%' 
     Inc,           // '++' 
     Dec,           // '--' 
+    Error = 129,   // Print error
 }TokenType;
 
 
@@ -45,6 +46,10 @@ void advance() {
 
 
 Token getNextToken(){
+
+    int plusCounter = 0;
+    int minusCounter = 0;
+
     while (peek() != '\0')
     {
         char current_char = peek();
@@ -79,37 +84,63 @@ Token getNextToken(){
             return create_token(Identifier, id);
         }
 
-        // Check for operator
-
-        if (peek() == '=') {
+        // check for +, ++, *, /, %, =, -, --
+        switch (peek())
+        {
+        case '=':
             advance();
-            return create_token(Assign, "=");
-        }
+            return create_token(Assign, "+");
 
-        if (peek() == '+') {
-            advance();
-            return create_token(Add, "+");
-        }
+        case '+':
+            while (peek() == '+')
+            {
+                advance();
+                plusCounter++;
+                if (plusCounter > 2)
+                {   
+                    return create_token(Error, "Syntax error");
+                }
+            }
+ 
+            return create_token(Assign, "+");
+        
+            if (plusCounter == 2)
+            {
+               return create_token(Dec, "++");
+            }
 
-        if (peek() == '-') {
-            advance();
-            return create_token(Sub, "-");
-        }
+        case '-':
+            while (peek() == '-')
+            {
+                advance();
+                minusCounter++;
+                if (minusCounter > 2)
+                {
+                    return create_token(Error, "Syntax error");
+                }
+            }
+            return create_token(Assign, "-");
 
-        if (peek() == '*') {
+            if (minusCounter == 2)
+            {
+                return create_token(Dec, "--");
+            }
+
+        case '*':
             advance();
             return create_token(Mul, "*");
-        }
 
-        if (peek() == '/') {
+        case '/':
             advance();
             return create_token(Div, "/");
-        }
 
-        if (peek() == '%') {
+        case '%':
             advance();
             return create_token(Mod, "%");
-        }        
+
+        default:
+            return create_token(Error, "Syntax error or unknown character");
+        }   
     }
     
 }
