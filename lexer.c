@@ -1,14 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>  
 #include <string.h> 
-#include <lexer.h>
-
-
-
-typedef struct {
-    TokenType type;
-    char value[256];  // Token value
-} Token;
+#include "lexer.h"
 
 char* input;
 int position = 0;
@@ -17,8 +10,12 @@ int position = 0;
 Token createToken(TokenType type, const char* value) {
     Token token;
     token.type = type;
-    strncpy(token.value, value, 255);
-    return token;
+    token.value = (char*)malloc(strlen(value) + 1);
+    if (token.value != NULL)
+    {
+        strncpy(token.value, value, strlen(value) + 1);
+    }
+        return token;
 }
 
 // Get the character
@@ -80,39 +77,30 @@ Token getNextToken(){
             return createToken(Assign, "=");
 
         case '+':
-            while (peek() == '+')
-            {
+            advance();
+            plusCounter = 1;  // On a déjà rencontré un '+'
+            if (peek() == '+') {
                 advance();
                 plusCounter++;
-                if (plusCounter > 2)
-                {   
-                    return createToken(Error, "Syntax error");
-                }
             }
- 
-            return createToken(Assign, "+");
-        
-            if (plusCounter == 2)
-            {
-               return createToken(Dec, "++");
+            
+            if (plusCounter == 2) {
+                return createToken(Inc, "++");
             }
+            return createToken(Add, "+");
 
         case '-':
-            while (peek() == '-')
-            {
+            advance();
+            minusCounter = 1;  // On a déjà rencontré un '-'
+            if (peek() == '-') {
                 advance();
                 minusCounter++;
-                if (minusCounter > 2)
-                {
-                    return createToken(Error, "Syntax error");
-                }
             }
-            return createToken(Assign, "-");
 
-            if (minusCounter == 2)
-            {
+            if (minusCounter == 2) {
                 return createToken(Dec, "--");
             }
+            return createToken(Sub, "-");
 
         case '*':
             advance();
@@ -139,6 +127,10 @@ int main() {
     do {
         token = getNextToken();
         printf("Token: Type = %d, Valeur = %s\n", token.type, token.value);
+
+        if (token.value != NULL) {
+            free(token.value);
+        }
     } while (token.type != Eof);
 
     return 0;

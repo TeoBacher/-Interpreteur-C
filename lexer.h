@@ -28,9 +28,9 @@ typedef struct {
 } Token;
 
 // Function prototypes
-Token *createToken(TokenType type, const char *value);
+Token createToken(TokenType type, const char *value);
 char peek();
 void advance();
-Token *getNextToken();
+Token getNextToken();
 
 #endif 
