@@ -5,14 +5,14 @@
 typedef enum {
     Number,        // 0-9
     Identifier,    // a-z, A-Z
-    Assign = 128,  // '=' assignment operator
-    Add,           // '+' addition
-    Sub,           // '-' subtraction
-    Mul,           // '*' multiplication
-    Div,           // '/' division
-    Mod,           // '%' modulo
-    Inc,           // '++' incrementation
-    Dec,           // '--' décrementation
+    Assign = 128,  // '=' 
+    Add,           // '+' 
+    Sub,           // '-' 
+    Mul,           // '*' 
+    Div,           // '/' 
+    Mod,           // '%' 
+    Inc,           // '++' 
+    Dec,           // '--' 
 }TokenType;
 
 
