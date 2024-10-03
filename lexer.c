@@ -16,7 +16,7 @@ typedef enum {
 
 typedef struct {
     TokenType type;
-    char value[256];  // La valeur du token
+    char value[256];  // Token value
 } Token;
 
 char* input;
