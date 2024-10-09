@@ -17,20 +17,19 @@ Par groupes de 3, vous allez créer un ***interpréteur*** simple pour un langag
 Votre ***interpréteur*** devra fonctionner de deux manières :
 
 1. **Mode Fichier** : L'utilisateur pourra exécuter un fichier contenant le code source.
-    
+
     ```bash
     ./mon_interpreteur fichier.monlang
     ```
-    
+
 2. **Mode Interactif** : L'utilisateur pourra entrer des commandes directement dans une interface en ligne de commande.
-    
+
     ```python
     ./mon_interpreteur
     > x = 5
     > print(x)
     5
     ```
-    
 
 ## Étapes du Projet
 
@@ -198,7 +197,7 @@ print(max)  // Doit afficher 20
 
 Un ***lexer*** transforme une chaîne de caractères en une série de ***tokens***. Voici quelques exemples :
 
-**Exemple 1 : Expression arithmétique simple**
+### Exemple 1 : Expression arithmétique simple**
 
 **Input :**
 
@@ -218,7 +217,7 @@ Un ***lexer*** transforme une chaîne de caractères en une série de ***tokens*
 ]
 ```
 
-**Exemple 2 : Affectation de variable**
+### Exemple 2 : Affectation de variable**
 
 **Input :**
 
@@ -238,7 +237,7 @@ x = 10 + y
 ]
 ```
 
-**Exemple 3 : Condition simple**
+### Exemple 3 : Condition simple**
 
 **Input :**
 
@@ -270,7 +269,7 @@ if (a > b) { print(a); }
 
 Un ***AST*** représente la structure hiérarchique de l'expression. Voici quelques exemples :
 
-**Exemple 1 : Expression arithmétique simple**
+### Exemple 1 : Expression arithmétique simple
 
 Pour l'expression `3 + 4 * 2`, l'***AST*** pourrait ressembler à :
 
@@ -282,7 +281,7 @@ graph TD
     C --> E["2"]
 ```
 
-**Exemple 2 : Affectation de variable**
+### Exemple 2 : Affectation de variable
 
 Pour l'expression `x = 10 + y`, l'***AST*** pourrait être :
 
@@ -294,7 +293,7 @@ graph TD
     C --> E["y"]
 ```
 
-**Exemple 3 : Condition simple**
+### Exemple 3 : Condition simple
 
 Pour `if (a > b) { print(a); }`, l'***AST*** pourrait être :
 
@@ -308,7 +307,7 @@ graph TD
     F --> G["a"]
 ```
 
-**Exemple combiné : Expression complexe**
+### Exemple combiné : Expression complexe
 
 Pour l'expression `x = 5 + 3 * (10 - 2)`, l'***AST*** serait :
 
@@ -343,4 +342,3 @@ graph TD
 - La copie de code non compris sera sévèrement pénalisée.
 
 > **Bon courage à tous !**
->

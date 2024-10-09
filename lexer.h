@@ -6,23 +6,33 @@
 #include <string.h>
 
 // Define token types
-typedef enum {
-    Number,        // 0-9
-    Identifier,    // a-z, A-Z
-    Assign = 128,  // '=' 
-    Add,           // '+' 
-    Sub,           // '-' 
-    Mul,           // '*' 
-    Div,           // '/' 
-    Mod,           // '%' 
-    Inc,           // '++' 
-    Dec,           // '--' 
-    Eof,           // End of file
-    Error = 129,   // Print error
-}TokenType;
+typedef enum
+{
+    Number = 0,     // 0-9
+    Identifier = 1, // a-z, A-Z
+    Add,            // '+'
+    Sub,            // '-'
+    Mul,            // '*'
+    Div,            // '/'
+    Mod,            // '%'
+    Inc,            // '++'
+    Dec,            // '--'
+    Pow,            // '^'
+    Lt,             // '<'
+    Le,             // '<='
+    Gt,             // '>'
+    Ge,             // '>='
+    Ne,             // '!='
+    Eof,            // End of file
+    Lparen,         // '('
+    Rparen,         // ')'
+    Assign = 128,   // '='
+    Error = 129,    // Print error
+} TokenType;
 
 // Define a token structure
-typedef struct {
+typedef struct
+{
     TokenType type;
     char *value;
 } Token;
@@ -33,4 +43,4 @@ char peek();
 void advance();
 Token getNextToken();
 
-#endif 
+#endif
