@@ -93,6 +93,12 @@ Token getNextToken()
                 advance();
             }
             id[i] = '\0';
+
+            // Check if the identifier is 'print'
+            if (strcmp(id, "print") == 0) {
+                return createToken(Print, "print");
+            }
+
             return createToken(Identifier, id);
         }
 
@@ -207,7 +213,14 @@ int main()
         "10 - 5 <= 5",
         "2 * 3 > 5",
         "10 / 2 >= 5",
-        "10 % 3 != 1"
+        "10 % 3 != 1",
+        "a = 1 + 1",
+        "b = a + 1",
+        "print(b)",
+        "x = 10 * 2",
+        "y = 100 / 20",
+        "result = x + y",
+        "print(result - 2)"
     };
 
     // Number of test expressions
@@ -239,7 +252,7 @@ int main()
         nextToken();
 
         int result = expression();
-        printf("Résultat : %d\n\n", result);
+        //printf("Résultat : %d\n\n", result);
     }
 
     return 0;

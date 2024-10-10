@@ -26,6 +26,7 @@ typedef enum
     Eof,            // End of file
     Lparen,         // '('
     Rparen,         // ')'
+    Print,          // For the print command
     Assign = 128,   // '='
     Error = 129,    // Print error
 } TokenType;

@@ -21,6 +21,8 @@
 #include "parser.h"
 
 Token currentToken;
+SymbolTableEntry symbolTable[100]; // Taille max de la table des symboles
+int symbolCount = 0;               // Initialisation à 0
 
 // Retrieves the next token
 void nextToken()
@@ -57,6 +59,28 @@ int factor()
     {
         value = atoi(currentToken.value);
         match(Number);
+    }
+    else if (currentToken.type == Identifier)
+    {
+        // Handle identifiers (variables)
+        char identifier[256];
+        strncpy(identifier, currentToken.value, 255);  // Save the variable name
+        match(Identifier);
+
+        if (currentToken.type == Assign)  // If it's an assignment (a = expression)
+        {
+            match(Assign);
+            value = expression();  // Evaluate the right-hand side
+            assignVariable(identifier, value);  // Assign the value to the variable
+        }
+        else
+        {
+            value = lookupVariable(identifier);  // Retrieve the value of the variable
+        }
+    }
+    else if (currentToken.type == Print)
+    {
+        parsePrintStatement();  // Gérer la commande print
     }
     else
     {
@@ -156,3 +180,56 @@ int expression()
     int lvalue = term();
     return exprTail(lvalue);
 }
+
+// Search for a variable in the symbol table
+int lookupVariable(const char *name)
+{
+    for (int i = 0; i < symbolCount; i++)
+    {
+        if (strcmp(symbolTable[i].identifier, name) == 0)
+        {
+            return symbolTable[i].value;
+        }
+    }
+    printf("Error: Variable %s not defined\n", name);
+    exit(1);
+}
+
+// Assign a value to a variable in the symbol table
+void assignVariable(const char *name, int value)
+{
+    // If the variable already exists, updates its value
+    for (int i = 0; i < symbolCount; i++)
+    {
+        if (strcmp(symbolTable[i].identifier, name) == 0)
+        {
+            symbolTable[i].value = value;
+            return;
+        }
+    }
+
+    // If the variable does not exist, creates a new entry
+    if (symbolCount < 100)
+    {
+        strncpy(symbolTable[symbolCount].identifier, name, 255);
+        symbolTable[symbolCount].value = value;
+        symbolCount++;
+    }
+    else
+    {
+        printf("Error: Symbol table full\n");
+        exit(1);
+    }
+}
+
+void parsePrintStatement() {
+    match(Print);   // we make sure that the token 'print' is there
+    match(Lparen);  // we expect an opening parenthesis '('
+
+    int value = expression();  // assesses the expression to print
+
+    match(Rparen);  // we expect a closing parenthesis ')'
+
+    printf("%d\n", value);
+}
+
