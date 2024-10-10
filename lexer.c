@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 #include "parser.h"
 
 const char *input;
@@ -233,34 +234,97 @@ void interpret(const char* inputExpression) {
     // }
 }
 
+// Function to read and interpret a line file by line
+void interpretFile(const char* fileName) {
+    FILE *file = fopen(fileName, "r");
+    if (file == NULL) {
+        perror("Erreur lors de l'ouverture du fichier");
+        return;
+    }
+
+    char line[256]; 
+    while (fgets(line, sizeof(line), file)) {
+        // Remove the return to the line at the end of each line
+        line[strcspn(line, "\n")] = 0;
+
+        interpret(line);
+    }
+
+    fclose(file);
+}
+
+// Function for interactive repl mode
+void interactiveMode() {
+    char inputLine[256];
+
+    printf("Mode interactif. Tapez 'exit' pour quitter.\n");
+
+    while (1) {
+        printf("> ");
+        if (fgets(inputLine, sizeof(inputLine), stdin) == NULL) {
+            break;
+        }
+
+        inputLine[strcspn(inputLine, "\n")] = 0;
+
+        if (strcmp(inputLine, "exit") == 0) {
+            break;
+        }
+
+        interpret(inputLine);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     if (argc > 1 && strcmp(argv[1], "1") == 0) {
         debugMode = 1;
     }
+    
+    int mode = 0;
+    
+    do{
+        printf("Choisissez le mode d'exécution:\n");
+        printf("1. Mode fichier\n");
+        printf("2. Mode interactif\n");
+        printf("Entrez votre choix (1 ou 2): ");
+        scanf("%d", &mode);
+        getchar();
+    }while(mode != 1 && mode != 2);
+    
 
-    interpret("2 ^ 3");
-    interpret("2 ^ 3 ^ 2");
-    interpret("10 ^ 2");
-    interpret("5 < 10");
-    interpret("10 <= 10");
-    interpret("15 > 10");
-    interpret("20 >= 20");
-    interpret("5 != 10");
-    interpret("2 + 3 < 5");
-    interpret("10 - 5 <= 5");
-    interpret("2 * 3 > 5");
-    interpret("10 / 2 >= 5");
-    interpret("10 % 3 != 1");
-    interpret("a = 1 + 1");
-    interpret("b = a + 1");
-    interpret("print(b)");
-    interpret("x = 10 * 2");
-    interpret("y = 100 / 20");
-    interpret("result = x + y");
-    interpret("print(result - 2)");
-    interpret("b = (1 + 2) * (3 - 1)");
-    interpret("print(b)");
+    if (mode == 1) {
+        interpretFile("code.txt");
+    } else if (mode == 2) {
+        interactiveMode();
+    }
+
+    // interpretFile("code.txt");
+
+    // interactiveMode();
+
+    // interpret("2 ^ 3");
+    // interpret("2 ^ 3 ^ 2");
+    // interpret("10 ^ 2");
+    // interpret("5 < 10");
+    // interpret("10 <= 10");
+    // interpret("15 > 10");
+    // interpret("20 >= 20");
+    // interpret("5 != 10");
+    // interpret("2 + 3 < 5");
+    // interpret("10 - 5 <= 5");
+    // interpret("2 * 3 > 5");
+    // interpret("10 / 2 >= 5");
+    // interpret("10 % 3 != 1");
+    // interpret("a = 1 + 1");
+    // interpret("b = a + 1");
+    // interpret("print(b)");
+    // interpret("x = 10 * 2");
+    // interpret("y = 100 / 20");
+    // interpret("result = x + y");
+    // interpret("print(result - 2)");
+    // interpret("b = (1 + 2) * (3 - 1)");
+    // interpret("print(b)");
 
     // Array of test expressions
     // const char* testExpressions[] = {
