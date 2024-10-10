@@ -22,6 +22,7 @@
 
 const char *input;
 int position = 0;
+int debugMode = 0;
 
 // Function that creates the token
 Token createToken(TokenType type, const char *value)
@@ -197,63 +198,127 @@ Token getNextToken()
     return createToken(Eof, "");
 }
 
-int main()
+void interpret(const char* inputExpression) {
+    input = inputExpression;
+    position = 0;
+
+    if (debugMode) {
+        printf("\nExpression: %s\n", input);
+        printf("Début de l'analyse lexicale\n");
+    }
+
+    Token token;
+    do {
+        token = getNextToken();
+        if (debugMode) {
+            printf("Token: Type = %d, Valeur = %s\n", token.type, token.value);
+        }
+
+        if (token.value != NULL) {
+            free(token.value);
+        }
+    } while (token.type != Eof);
+
+    if (debugMode) {
+        printf("Fin de l'analyse lexicale\n\n");
+    }
+
+    position = 0;
+    nextToken();
+
+    int result = expression();
+
+    // if (strstr(input, "print") == NULL) {
+    //     printf("Résultat : %d\n\n", result);
+    // }
+}
+
+int main(int argc, char *argv[])
 {
+    if (argc > 1 && strcmp(argv[1], "1") == 0) {
+        debugMode = 1;
+    }
+
+    interpret("2 ^ 3");
+    interpret("2 ^ 3 ^ 2");
+    interpret("10 ^ 2");
+    interpret("5 < 10");
+    interpret("10 <= 10");
+    interpret("15 > 10");
+    interpret("20 >= 20");
+    interpret("5 != 10");
+    interpret("2 + 3 < 5");
+    interpret("10 - 5 <= 5");
+    interpret("2 * 3 > 5");
+    interpret("10 / 2 >= 5");
+    interpret("10 % 3 != 1");
+    interpret("a = 1 + 1");
+    interpret("b = a + 1");
+    interpret("print(b)");
+    interpret("x = 10 * 2");
+    interpret("y = 100 / 20");
+    interpret("result = x + y");
+    interpret("print(result - 2)");
+    interpret("b = (1 + 2) * (3 - 1)");
+    interpret("print(b)");
+
     // Array of test expressions
-    const char* testExpressions[] = {
-        "2 ^ 3",
-        "2 ^ 3 ^ 2",
-        "10 ^ 2",
-        "5 < 10",
-        "10 <= 10",
-        "15 > 10",
-        "20 >= 20",
-        "5 != 10",
-        "2 + 3 < 5",
-        "10 - 5 <= 5",
-        "2 * 3 > 5",
-        "10 / 2 >= 5",
-        "10 % 3 != 1",
-        "a = 1 + 1",
-        "b = a + 1",
-        "print(b)",
-        "x = 10 * 2",
-        "y = 100 / 20",
-        "result = x + y",
-        "print(result - 2)"
-    };
+    // const char* testExpressions[] = {
+    //     "2 ^ 3",
+    //     "2 ^ 3 ^ 2",
+    //     "10 ^ 2",
+    //     "5 < 10",
+    //     "10 <= 10",
+    //     "15 > 10",
+    //     "20 >= 20",
+    //     "5 != 10",
+    //     "2 + 3 < 5",
+    //     "10 - 5 <= 5",
+    //     "2 * 3 > 5",
+    //     "10 / 2 >= 5",
+    //     "10 % 3 != 1",
+    //     "a = 1 + 1",
+    //     "b = a + 1",
+    //     "print(b)",
+    //     "x = 10 * 2",
+    //     "y = 100 / 20",
+    //     "result = x + y",
+    //     "print(result - 2)",
+    //     "b = (1 + 2) * (3 - 1)",
+    //     "print(b)"
+    // };
 
     // Number of test expressions
-    int numTests = sizeof(testExpressions) / sizeof(testExpressions[0]);
+    // int numTests = sizeof(testExpressions) / sizeof(testExpressions[0]);
 
-    for (int i = 0; i < numTests; i++)
-    {
-        input = testExpressions[i];
-        position = 0;
+    // for (int i = 0; i < numTests; i++)
+    // {
+    //     input = testExpressions[i];
+    //     position = 0;
 
-        printf("Expression: %s\n", input);
-        printf("Début de l'analyse lexicale\n");
+    //     printf("Expression: %s\n", input);
+    //     printf("Début de l'analyse lexicale\n");
 
-        Token token;
-        do
-        {
-            token = getNextToken();
-            printf("Token: Type = %d, Valeur = %s\n", token.type, token.value);
+    //     Token token;
+    //     do
+    //     {
+    //         token = getNextToken();
+    //         printf("Token: Type = %d, Valeur = %s\n", token.type, token.value);
 
-            if (token.value != NULL)
-            {
-                free(token.value);
-            }
-        } while (token.type != Eof);
+    //         if (token.value != NULL)
+    //         {
+    //             free(token.value);
+    //         }
+    //     } while (token.type != Eof);
 
-        printf("Fin de l'analyse lexicale\n");
+    //     printf("Fin de l'analyse lexicale\n");
 
-        position = 0;
-        nextToken();
+    //     position = 0;
+    //     nextToken();
 
-        int result = expression();
-        //printf("Résultat : %d\n\n", result);
-    }
+    //     int result = expression();
+    //     //printf("Résultat : %d\n\n", result);
+    // }
 
     return 0;
 }

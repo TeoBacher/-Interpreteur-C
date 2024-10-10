@@ -28,7 +28,7 @@ int symbolCount = 0;
 void nextToken()
 {
     currentToken = getNextToken();
-    printf("Current token: Type = %d, Value = %s\n", currentToken.type, currentToken.value);
+    //printf("Current token: Type = %d, Value = %s\n", currentToken.type, currentToken.value);
 }
 
 // Matches the current token with the expected token

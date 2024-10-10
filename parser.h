@@ -8,7 +8,7 @@
 
 //Token currentToken;
 
-// Table des symboles
+// Symbol table
 typedef struct {
     char identifier[256];  // Name of the variable
     int value;             // Value associated with the variable
@@ -35,7 +35,7 @@ int power(int value);
 
 void parsePrintStatement();
 
-int lookupVariable(const char *name);   // Recherche la valeur d'une variable
-void assignVariable(const char *name, int value);  // Affecte une valeur à une variable
+int lookupVariable(const char *name);   // Research the value of a variable
+void assignVariable(const char *name, int value);  // Assign a value to a variable
 
 #endif
