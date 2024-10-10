@@ -21,8 +21,8 @@
 #include "parser.h"
 
 Token currentToken;
-SymbolTableEntry symbolTable[100]; // Taille max de la table des symboles
-int symbolCount = 0;               // Initialisation à 0
+SymbolTableEntry symbolTable[100]; // Max size of the symbol table
+int symbolCount = 0;        
 
 // Retrieves the next token
 void nextToken()
