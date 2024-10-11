@@ -203,7 +203,7 @@ int main()
         "15 > 10",
         "20 >= 20",
         "5 != 10",
-        "2 + 3 < 5",
+        "(2 + 3) * 2",
         "10 - 5 <= 5",
         "2 * 3 > 5",
         "10 / 2 >= 5",
@@ -219,27 +219,24 @@ int main()
         position = 0;
 
         printf("Expression: %s\n", input);
-        printf("Début de l'analyse lexicale\n");
 
         Token token;
         do
         {
             token = getNextToken();
-            printf("Token: Type = %d, Valeur = %s\n", token.type, token.value);
-
             if (token.value != NULL)
             {
                 free(token.value);
             }
         } while (token.type != Eof);
 
-        printf("Fin de l'analyse lexicale\n");
-
         position = 0;
         nextToken();
 
-        int result = expression();
-        printf("Résultat : %d\n\n", result);
+        ASTNode* ast = expression();
+
+        int result = evaluateAST(ast);
+        printf("Résultat : %d\n", result);
     }
 
     return 0;

@@ -22,11 +22,29 @@
 
 Token currentToken;
 
+
+ASTNode* createNumberNode(int value) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    node->type = Number;
+    node->value = value;
+    node->left = node->right = NULL;
+    return node;
+}
+
+ASTNode* createOperatorNode(TokenType type, ASTNode* left, ASTNode* right) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    node->type = type;
+    node->value = 0;  
+    node->left = left;
+    node->right = right;
+    return node;
+}
+
+
 // Retrieves the next token
 void nextToken()
 {
     currentToken = getNextToken();
-    printf("Current token: Type = %d, Value = %s\n", currentToken.type, currentToken.value);
 }
 
 // Matches the current token with the expected token
@@ -44,18 +62,19 @@ void match(TokenType expected)
 }
 
 // Manages the basic elements of arithmetic expressions (numbers and parentheses)
-int factor()
+ASTNode* factor()
 {
-    int value = 0;
+    ASTNode* node;
+
     if (currentToken.type == Lparen)
     {
         match(Lparen);
-        value = expression();
+        node = expression();
         match(Rparen);
     }
     else if (currentToken.type == Number)
     {
-        value = atoi(currentToken.value);
+        node = createNumberNode(atoi(currentToken.value));
         match(Number);
     }
     else
@@ -64,95 +83,69 @@ int factor()
         exit(1);
     }
 
-    // Check for power operator
-    if (currentToken.type == Pow)
-    {
+    if (currentToken.type == Pow) {
         match(Pow);
-        int exponent = factor();
-        value = pow(value, exponent); // Use the math.h library to calculate the power
+        node = createOperatorNode(Pow, node, factor());  
     }
-
-    return value;
+    return node;
 }
 
 // Manages the multiplication, division and modulo operators
-int termTail(int lvalue)
+ASTNode* termTail(ASTNode* lvalue)
 {
     while (currentToken.type == Mul || currentToken.type == Div || currentToken.type == Mod)
     {
         TokenType op = currentToken.type;
         match(op);
-        int rvalue = factor();
-        switch (op)
-        {
-        case Mul:
-            lvalue *= rvalue;
-            break;
-        case Div:
-            lvalue /= rvalue;
-            break;
-        case Mod:
-            lvalue %= rvalue;
-            break;
-        default:
-            printf("Syntax error: unexpected operator\n");
-            exit(1);
-        }
+        ASTNode* rvalue = factor();
+        lvalue = createOperatorNode(op, lvalue, rvalue);  
     }
     return lvalue;
 }
 
 // This function calculates the value of a term, which is defined as a factor (a number or a parenthesis)
 // possibly followed by multiplication or division.
-int term()
+ASTNode* term()
 {
-    int lvalue = factor();
+    ASTNode* lvalue = factor();;
     return termTail(lvalue);
 }
 
 // Manages the addition and subtraction operators
-int exprTail(int lvalue)
+ASTNode* exprTail(ASTNode* lvalue)
 {
-    switch (currentToken.type)
-    {
-    case Add:
-        match(Add);
-        return exprTail(lvalue + term());
-    case Sub:
-        match(Sub);
-        return exprTail(lvalue - term());
-    case Lt:
-        match(Lt);
-        return exprTail(lvalue < term());
-    case Le:
-        match(Le);
-        return exprTail(lvalue <= term());
-    case Gt:
-        match(Gt);
-        return exprTail(lvalue > term());
-    case Ge:
-        match(Ge);
-        return exprTail(lvalue >= term());
-    case Ne:
-        match(Ne);
-        return exprTail(lvalue != term());
-    default:
-        return lvalue;
+    while (currentToken.type == Add || currentToken.type == Sub) {
+        TokenType op = currentToken.type;
+        match(op);
+        ASTNode* rvalue = term(); 
+        lvalue = createOperatorNode(op, lvalue, rvalue);  
     }
-}
-
-int power(int value)
-{
-    match(Pow);
-
-    int exponent = factor();
-    return pow(value, exponent);
+    return lvalue;
 }
 
 // This function calculates the value of an expression,
 // which is defined as a term possibly followed by an addition or subtraction.
-int expression()
+ASTNode* expression()
 {
-    int lvalue = term();
+    ASTNode* lvalue = term(); 
     return exprTail(lvalue);
+}
+
+int evaluateAST(ASTNode* node) {
+    if (node->type == Number) {
+        return node->value;  
+    }
+
+    int leftValue = evaluateAST(node->left);
+    int rightValue = evaluateAST(node->right);
+
+    switch (node->type) {
+        case Add: return leftValue + rightValue;
+        case Sub: return leftValue - rightValue;
+        case Mul: return leftValue * rightValue;
+        case Div: return leftValue / rightValue;
+        case Mod: return leftValue % rightValue;
+        case Pow: return pow(leftValue, rightValue);
+        default: printf("Unknown operator: %d\n", node->type); exit(1);
+    }
 }

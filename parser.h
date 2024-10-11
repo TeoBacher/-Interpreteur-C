@@ -8,20 +8,32 @@
 
 Token currentToken;
 
-void nextToken();
+typedef struct ASTNode {
+    TokenType type;            
+    int value;                 
+    struct ASTNode* left;      
+    struct ASTNode* right;     
+} ASTNode;
 
 void match(TokenType expected);
 
-int factor();
+void nextToken();
 
-int term();
+ASTNode* factor();
 
-int expression();
+ASTNode* term();
 
-int exprTail(int lvalue);
+ASTNode* termTail(ASTNode* lvalue);
 
-int termTail(int lvalue);
+ASTNode* expression();
 
-int power(int value);
+ASTNode* exprTail(ASTNode* lvalue);
+
+ASTNode* createNumberNode(int value);
+
+ASTNode* createOperatorNode(TokenType type, ASTNode* left, ASTNode* right);
+
+int evaluateAST(ASTNode* node);
+
 
 #endif
