@@ -19,6 +19,8 @@ void match(TokenType expected);
 
 void nextToken();
 
+void printStatement();
+
 ASTNode* factor();
 
 ASTNode* term();

@@ -65,6 +65,7 @@ void match(TokenType expected)
 ASTNode* factor()
 {
     ASTNode* node;
+    printf("Current token in factor: Type = %d, Value = %s\n", currentToken.type, currentToken.value);  // Debug
 
     if (currentToken.type == Lparen)
     {
@@ -130,6 +131,21 @@ ASTNode* expression()
     ASTNode* lvalue = term(); 
     return exprTail(lvalue);
 }
+
+void printStatement() {
+    match(Printf);  
+    match(Lparen);  
+
+    ASTNode* value = expression();  
+
+    match(Rparen); 
+
+    int result = evaluateAST(value);  
+
+    printf("%d\n", result); 
+}
+
+
 
 int evaluateAST(ASTNode* node) {
     if (node->type == Number) {

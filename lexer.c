@@ -48,47 +48,47 @@ void advance()
     position++;
 }
 
-// Function for getting the next token
-Token getNextToken()
+void ignoreSpaces()
 {
-
-    int plusCounter = 0;
-    int minusCounter = 0;
-
-    // Return Eof if the end of the input is reached
-    while (peek() != '\0')
+    while (isspace(peek()))
     {
+        advance();
+    }
+}
+
+Token getNextToken() {
+    while (peek() != '\0') {
         char current_char = peek();
 
-        // Skip whitespaces
-        if (isspace(current_char))
-        {
-            advance();
-            continue;
+        ignoreSpaces();
+
+        current_char = peek();  
+
+        if (strncmp(input + position, "printf", 6) == 0 && !isalnum(input[position + 6])) {
+            position += 6;  
+
+            ignoreSpaces(); 
+            
+            current_char = peek();  
+
+            return createToken(Printf, "printf");
         }
 
-        // Check if the current character is a digit
-        if (isdigit(current_char))
-        {
+        if (isdigit(current_char)) {
             char number[256];
             int i = 0;
-            while (isdigit(peek()))
-            {
+            while (isdigit(peek())) {
                 number[i++] = peek();
                 advance();
             }
             number[i] = '\0';
-
             return createToken(Number, number);
         }
 
-        // Check if the current character is an identifier
-        if (isalpha(current_char))
-        {
+        if (isalpha(current_char)) {
             char id[256];
             int i = 0;
-            while (isalpha(peek()))
-            {
+            while (isalpha(peek())) {
                 id[i++] = peek();
                 advance();
             }
@@ -96,118 +96,62 @@ Token getNextToken()
             return createToken(Identifier, id);
         }
 
-        // check for arithmetic operators
-        switch (peek())
-        {
-        case '=':
-            advance();
-            return createToken(Assign, "=");
-
-        case '+':
-            advance();
-            plusCounter = 1;
-            if (peek() == '+')
-            {
+        // Operator (+, -, *, etc.)
+        switch (current_char) {
+            case '=':
                 advance();
-                plusCounter++;
-            }
-
-            if (plusCounter == 2)
-            {
-                return createToken(Inc, "++");
-            }
-            return createToken(Add, "+");
-
-        case '-':
-            advance();
-            minusCounter = 1;
-            if (peek() == '-')
-            {
+                return createToken(Assign, "=");
+            case '+':
                 advance();
-                minusCounter++;
-            }
-
-            if (minusCounter == 2)
-            {
-                return createToken(Dec, "--");
-            }
-            return createToken(Sub, "-");
-
-        case '*':
-            advance();
-            return createToken(Mul, "*");
-
-        case '/':
-            advance();
-            return createToken(Div, "/");
-
-        case '%':
-            advance();
-            return createToken(Mod, "%");
-        
-        case '^':
-            advance();
-            return createToken(Pow, "^");
-
-        case '(':
-            advance();
-            return createToken(Lparen, "(");
-
-        case ')':
-            advance();
-            return createToken(Rparen, ")");
-
-        case '<':
-            advance();
-            if (peek() == '=')
-            {
+                return createToken(Add, "+");
+            case '-':
                 advance();
-                return createToken(Le, "<=");
-            }
-            return createToken(Lt, "<");
-
-        case '>':
-            advance();
-            if (peek() == '=')
-            {
+                return createToken(Sub, "-");
+            case '*':
                 advance();
-                return createToken(Ge, ">=");
-            }
-            return createToken(Gt, ">");
-
-        case '!':
-            advance();
-            if (peek() == '=')
-            {
+                return createToken(Mul, "*");
+            case '/':
                 advance();
-                return createToken(Ne, "!=");
-            }
-            return createToken(Error, "Syntax error or unknown character");
-
-        default:
-            return createToken(Error, "Syntax error or unknown character");
+                return createToken(Div, "/");
+            case '%':
+                advance();
+                return createToken(Mod, "%");
+            case '^':
+                advance();
+                return createToken(Pow, "^");
+            case '(':
+                advance();
+                return createToken(Lparen, "(");
+            case ')':
+                advance();
+                return createToken(Rparen, ")");
+            default:
+                printf("Syntax error at char: '%c', Position: %d\n", current_char, position);  // Debug
+                return createToken(Error, "Syntax error or unknown character");
         }
     }
     return createToken(Eof, "");
 }
 
+
 int main()
 {
     // Array of test expressions
     const char* testExpressions[] = {
-        "2 ^ 3",
-        "2 ^ 3 ^ 2",
-        "10 ^ 2",
-        "5 < 10",
-        "10 <= 10",
-        "15 > 10",
-        "20 >= 20",
-        "5 != 10",
-        "(2 + 3) * 2",
-        "10 - 5 <= 5",
-        "2 * 3 > 5",
-        "10 / 2 >= 5",
-        "10 % 3 != 1"
+        // "2 ^ 3",
+        // "2 ^ 3 ^ 2",
+        // "10 ^ 2",
+        // "5 < 10",
+        // "10 <= 10",
+        // "15 > 10",
+        // "20 >= 20",
+        // "5 != 10",
+        // "(2 + 3) * 2",
+        // "10 - 5 <= 5",
+        // "2 * 3 > 5",
+        // "10 / 2 >= 5",
+        // "10 % 3 != 1",
+        "printf( (2 + 3) * 4 )",
     };
 
     // Number of test expressions
@@ -233,10 +177,13 @@ int main()
         position = 0;
         nextToken();
 
-        ASTNode* ast = expression();
-
-        int result = evaluateAST(ast);
-        printf("Résultat : %d\n", result);
+        if (currentToken.type == Printf) {
+            printStatement();
+        } else {
+            ASTNode* ast = expression();
+            int result = evaluateAST(ast);
+            printf("Résultat : %d\n", result);
+        }
     }
 
     return 0;
