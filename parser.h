@@ -15,6 +15,16 @@ typedef struct ASTNode {
     struct ASTNode* right;     
 } ASTNode;
 
+// Symbol table
+typedef struct {
+    char identifier[256];  // Name of the variable
+    int value;             // Value associated with the variable
+} SymbolTableEntry;
+
+extern SymbolTableEntry symbolTable[100]; // Max size of the symbol table
+extern int symbolCount;                   // Number of entries in the symbol table
+
+
 void match(TokenType expected);
 
 void nextToken();
@@ -37,5 +47,8 @@ ASTNode* createOperatorNode(TokenType type, ASTNode* left, ASTNode* right);
 
 int evaluateAST(ASTNode* node);
 
+int lookupVariable(const char *name);   // Research the value of a variable
+
+void assignVariable(const char *name, int value);  // Assign a value to a variable
 
 #endif

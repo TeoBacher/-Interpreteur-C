@@ -22,6 +22,55 @@
 
 Token currentToken;
 
+SymbolTableEntry symbolTable[100];  
+int symbolCount = 0;    
+
+
+// Search for a variable in the symbol table
+int lookupVariable(const char *name) {
+    printf("Looking for variable: %s\n", name);
+
+    for (int i = 0; i < symbolCount; i++) {
+        printf("Checking variable: %s with value: %d\n", symbolTable[i].identifier, symbolTable[i].value);
+        if (strcmp(symbolTable[i].identifier, name) == 0) {
+            // printf("Found variable: %s, Value: %d\n", name, symbolTable[i].value);
+            return symbolTable[i].value;
+        }
+    }
+
+    printf("Error: Variable %s not defined\n", name);
+    exit(1);
+}
+
+
+
+
+// Assign a value to a variable in the symbol table
+void assignVariable(const char *name, int value) {
+    for (int i = 0; i < symbolCount; i++) {
+        if (strcmp(symbolTable[i].identifier, name) == 0) {
+            symbolTable[i].value = value;
+            return;
+        }
+    }
+
+    if (symbolCount < 100) {
+        strncpy(symbolTable[symbolCount].identifier, name, 255);  
+        symbolTable[symbolCount].value = value;  
+        symbolCount++;  
+    } else {
+        printf("Error: Symbol table full\n");
+        exit(1);
+    }
+
+    // printf("Current symbol table:\n");
+    // for (int i = 0; i < symbolCount; i++) {
+    //     printf("Variable: %s, Value: %d\n", symbolTable[i].identifier, symbolTable[i].value);
+    // }
+}
+
+
+
 
 ASTNode* createNumberNode(int value) {
     ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
@@ -37,6 +86,7 @@ ASTNode* createOperatorNode(TokenType type, ASTNode* left, ASTNode* right) {
     node->value = 0;  
     node->left = left;
     node->right = right;
+    // printf("Created operator node: Type = %d, Left value = %d, Right value = %d\n", type, left->value, right->value); 
     return node;
 }
 
@@ -45,6 +95,8 @@ ASTNode* createOperatorNode(TokenType type, ASTNode* left, ASTNode* right) {
 void nextToken()
 {
     currentToken = getNextToken();
+    // printf("NextToken /// Current token in parser: Type = %d, Value = %s\n", currentToken.type, currentToken.value);  // Debug du token reçu par le parser
+
 }
 
 // Matches the current token with the expected token
@@ -61,33 +113,34 @@ void match(TokenType expected)
     }
 }
 
-// Manages the basic elements of arithmetic expressions (numbers and parentheses)
-ASTNode* factor()
-{
+ASTNode* factor() {
     ASTNode* node;
-    printf("Current token in factor: Type = %d, Value = %s\n", currentToken.type, currentToken.value);  // Debug
 
-    if (currentToken.type == Lparen)
-    {
-        match(Lparen);
-        node = expression();
-        match(Rparen);
+    // printf("Factor ?????? Type = %d, Value = %s\n", currentToken.type, currentToken.value); 
+
+    if (currentToken.type == Lparen) {
+        match(Lparen);  
+        node = expression(); 
+        match(Rparen);  
     }
-    else if (currentToken.type == Number)
-    {
-        node = createNumberNode(atoi(currentToken.value));
-        match(Number);
+    else if (currentToken.type == Number) {
+        node = createNumberNode(atoi(currentToken.value));  
+        match(Number); 
     }
-    else
-    {
-        printf("Syntax error: waiting for a number or a parenthesis\n");
+    else if (currentToken.type == Identifier) {
+        // printf("Entering Identifier block for: %s\n", currentToken.value);  
+        int value = lookupVariable(currentToken.value);  
+        node = createNumberNode(value);  
+
+        match(Identifier);  
+
+        return node;  
+    }
+    else {
+        printf("Unexpected token in factor: Type = %d, Value = %s\n", currentToken.type, currentToken.value);
         exit(1);
     }
 
-    if (currentToken.type == Pow) {
-        match(Pow);
-        node = createOperatorNode(Pow, node, factor());  
-    }
     return node;
 }
 
@@ -108,6 +161,7 @@ ASTNode* termTail(ASTNode* lvalue)
 // possibly followed by multiplication or division.
 ASTNode* term()
 {
+    // printf("Entering term with token: Type = %d, Value = %s\n", currentToken.type, currentToken.value);
     ASTNode* lvalue = factor();;
     return termTail(lvalue);
 }
@@ -117,6 +171,7 @@ ASTNode* exprTail(ASTNode* lvalue)
 {
     while (currentToken.type == Add || currentToken.type == Sub) {
         TokenType op = currentToken.type;
+        printf("Found operator: %d\n", op);
         match(op);
         ASTNode* rvalue = term(); 
         lvalue = createOperatorNode(op, lvalue, rvalue);  
@@ -126,24 +181,52 @@ ASTNode* exprTail(ASTNode* lvalue)
 
 // This function calculates the value of an expression,
 // which is defined as a term possibly followed by an addition or subtraction.
-ASTNode* expression()
-{
-    ASTNode* lvalue = term(); 
+ASTNode* expression() {
+
+    if (currentToken.type == Identifier) {
+        char varName[256];
+        strcpy(varName, currentToken.value); 
+        match(Identifier);  
+
+        if (currentToken.type == Assign) {
+            match(Assign);  
+            
+            ASTNode* exprNode = term();  
+            exprNode = exprTail(exprNode);  
+            
+            int value = evaluateAST(exprNode); 
+            assignVariable(varName, value);  
+            
+            return createNumberNode(value);  
+        } else {
+            int value = lookupVariable(varName);  
+            return createNumberNode(value);  
+        }
+    }
+
+    ASTNode* lvalue = term();
     return exprTail(lvalue);
 }
+
+
 
 void printStatement() {
     match(Printf);  
     match(Lparen);  
 
-    ASTNode* value = expression();  
 
-    match(Rparen); 
+    ASTNode* value = expression();
+
+    match(Rparen);  
 
     int result = evaluateAST(value);  
-
     printf("%d\n", result); 
+
+    free(value);  
 }
+
+
+
 
 
 
@@ -154,6 +237,9 @@ int evaluateAST(ASTNode* node) {
 
     int leftValue = evaluateAST(node->left);
     int rightValue = evaluateAST(node->right);
+
+    // printf("Evaluating: Left = %d, Right = %d, Operator = %d\n", leftValue, rightValue, node->type);
+
 
     switch (node->type) {
         case Add: return leftValue + rightValue;

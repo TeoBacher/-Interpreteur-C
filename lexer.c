@@ -33,6 +33,8 @@ Token createToken(TokenType type, const char *value)
     {
         strncpy(token.value, value, strlen(value) + 1);
     }
+        printf("Creating Token: Type = %d, Value = %s\n", type, value);  // Debug: vérifier le type et la valeur du token
+
     return token;
 }
 
@@ -96,6 +98,7 @@ Token getNextToken() {
             return createToken(Identifier, id);
         }
 
+
         // Operator (+, -, *, etc.)
         switch (current_char) {
             case '=':
@@ -151,7 +154,13 @@ int main()
         // "2 * 3 > 5",
         // "10 / 2 >= 5",
         // "10 % 3 != 1",
-        "printf( (2 + 3) * 4 )",
+        // "printf((2 + 3) * 4 )",
+        "x = 5 + 3",
+        "printf( x )",
+        "y =  x + x + 5",
+        "printf( y )",
+        "y = y * 2",
+        "printf( y )"
     };
 
     // Number of test expressions
@@ -164,26 +173,16 @@ int main()
 
         printf("Expression: %s\n", input);
 
-        Token token;
-        do
-        {
-            token = getNextToken();
-            if (token.value != NULL)
-            {
-                free(token.value);
-            }
-        } while (token.type != Eof);
-
-        position = 0;
-        nextToken();
+        nextToken();  
 
         if (currentToken.type == Printf) {
-            printStatement();
-        } else {
-            ASTNode* ast = expression();
-            int result = evaluateAST(ast);
-            printf("Résultat : %d\n", result);
-        }
+    printStatement(); 
+    } 
+    else {
+        ASTNode* ast = expression(); 
+        int result = evaluateAST(ast);
+        printf("Résultat : %d\n", result);
+    }
     }
 
     return 0;
