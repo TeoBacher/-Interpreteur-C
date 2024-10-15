@@ -69,6 +69,21 @@ Token getNextToken() {
 
         current_char = peek();  
 
+        if (strncmp(input + position, "int", 3) == 0 && !isalnum(input[position + 3])) {
+            position += 3;
+            return createToken(Int, "int");
+        }
+
+        if (strncmp(input + position, "float", 5) == 0 && !isalnum(input[position + 5])) {
+            position += 5;
+            return createToken(Float, "float");
+        }
+
+        if (strncmp(input + position, "char", 4) == 0 && !isalnum(input[position + 4])) {
+            position += 4;
+            return createToken(Char, "char");
+        }
+
         if (strncmp(input + position, "printf", 6) == 0 && !isalnum(input[position + 6])) {
             position += 6;  
 

@@ -18,12 +18,26 @@ typedef struct ASTNode {
 // Symbol table
 typedef struct {
     char identifier[256];  // Name of the variable
-    int value;             // Value associated with the variable
+    VariableType type;      
+    union {                 
+        int intValue;
+        float floatValue;
+        char stringValue[256];
+        int boolValue;     
+    } value;
 } SymbolTableEntry;
 
 extern SymbolTableEntry symbolTable[100]; // Max size of the symbol table
 extern int symbolCount;                   // Number of entries in the symbol table
 
+
+typedef enum {
+    TYPE_INT,
+    TYPE_FLOAT,
+    TYPE_STRING,
+    TYPE_BOOL,
+    TYPE_UNDEFINED
+} VariableType;
 
 void match(TokenType expected);
 
@@ -49,6 +63,8 @@ int evaluateAST(ASTNode* node);
 
 int lookupVariable(const char *name);   // Research the value of a variable
 
-void assignVariable(const char *name, int value);  // Assign a value to a variable
+void  assignVariable(const char *name, VariableType type, void* value);  // Assign a value to a variable
+
+void checkVariableType(VariableType expected, VariableType actual)
 
 #endif

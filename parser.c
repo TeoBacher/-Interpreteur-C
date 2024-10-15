@@ -26,15 +26,24 @@ SymbolTableEntry symbolTable[100];
 int symbolCount = 0;    
 
 
+
+void checkVariableType(VariableType expected, VariableType actual){
+    if (expected != actual) {
+        printf("Type error: expected %d but got %d\n", expected, actual);
+        exit(1);
+    }
+}
+
+
 // Search for a variable in the symbol table
 int lookupVariable(const char *name) {
     printf("Looking for variable: %s\n", name);
 
     for (int i = 0; i < symbolCount; i++) {
-        printf("Checking variable: %s with value: %d\n", symbolTable[i].identifier, symbolTable[i].value);
+        printf("Checking variable: %s with value: %d\n", symbolTable[i].identifier, symbolTable[i].value.intValue);
         if (strcmp(symbolTable[i].identifier, name) == 0) {
             // printf("Found variable: %s, Value: %d\n", name, symbolTable[i].value);
-            return symbolTable[i].value;
+            return symbolTable[i].value.intValue;
         }
     }
 
@@ -46,28 +55,58 @@ int lookupVariable(const char *name) {
 
 
 // Assign a value to a variable in the symbol table
-void assignVariable(const char *name, int value) {
+void assignVariable(const char *name, VariableType type, void* value) {
     for (int i = 0; i < symbolCount; i++) {
         if (strcmp(symbolTable[i].identifier, name) == 0) {
-            symbolTable[i].value = value;
-            return;
+            checkTypeCompatibility(symbolTable[i].type, type);
+            switch (type) {
+                case TYPE_INT:
+                    symbolTable[i].value.intValue = *((int*)value);
+                    break;
+                case TYPE_FLOAT:
+                    symbolTable[i].value.floatValue = *((float*)value);
+                    break;
+                case TYPE_STRING:
+                    strncpy(symbolTable[i].value.stringValue, (char*)value, 255);
+                    break;
+                case TYPE_BOOL:
+                    symbolTable[i].value.boolValue = *((int*)value);
+                    break;
+                default:
+                    printf("Type error: unsupported type.\n");
+                    exit(1);
+            }
         }
     }
 
+    // If the variable does not exist, we add it with its type and value
     if (symbolCount < 100) {
-        strncpy(symbolTable[symbolCount].identifier, name, 255);  
-        symbolTable[symbolCount].value = value;  
-        symbolCount++;  
+        strncpy(symbolTable[symbolCount].identifier, name, 255);
+        symbolTable[symbolCount].type = type;
+        switch (type) {
+            case TYPE_INT:
+                symbolTable[symbolCount].value.intValue = *((int*)value);
+                break;
+            case TYPE_FLOAT:
+                symbolTable[symbolCount].value.floatValue = *((float*)value);
+                break;
+            case TYPE_STRING:
+                strncpy(symbolTable[symbolCount].value.stringValue, (char*)value, 255);
+                break;
+            case TYPE_BOOL:
+                symbolTable[symbolCount].value.boolValue = *((int*)value);
+                break;
+            default:
+                printf("Type error: unsupported type.\n");
+                exit(1);
+        }
+        symbolCount++;
     } else {
         printf("Error: Symbol table full\n");
         exit(1);
     }
-
-    // printf("Current symbol table:\n");
-    // for (int i = 0; i < symbolCount; i++) {
-    //     printf("Variable: %s, Value: %d\n", symbolTable[i].identifier, symbolTable[i].value);
-    // }
 }
+
 
 
 
@@ -195,7 +234,7 @@ ASTNode* expression() {
             exprNode = exprTail(exprNode);  
             
             int value = evaluateAST(exprNode); 
-            assignVariable(varName, value);  
+            assignVariable(varName, TYPE_INT, &value);
             
             return createNumberNode(value);  
         } else {

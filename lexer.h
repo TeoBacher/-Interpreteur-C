@@ -23,7 +23,10 @@ typedef enum
     Gt,             // '>'
     Ge,             // '>='
     Ne,             // '!='
-    Printf,
+    Int,            // 'int'
+    Float,          // 'float'
+    Char,           // 'char'
+    Printf,         // 'printf'
     Eof,            // End of file
     Lparen,         // '('
     Rparen,         // ')'
