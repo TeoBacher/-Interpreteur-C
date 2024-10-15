@@ -17,21 +17,48 @@ typedef struct {
 extern SymbolTableEntry symbolTable[100]; // Max size of the symbol table
 extern int symbolCount;                   // Variable counter
 
-void nextToken();
+typedef struct ASTNode {
+    TokenType type;            
+    int value;                 
+    struct ASTNode* left;      
+    struct ASTNode* right;     
+} ASTNode;
+
+// Symbol table
+typedef struct {
+    char identifier[256];  // Name of the variable
+    int value;             // Value associated with the variable
+} SymbolTableEntry;
+
+extern SymbolTableEntry symbolTable[100]; // Max size of the symbol table
+extern int symbolCount;                   // Number of entries in the symbol table
+
 
 void match(TokenType expected);
 
-int factor();
+void nextToken();
 
-int term();
+void printStatement();
 
-int expression();
+ASTNode* factor();
 
-int exprTail(int lvalue);
+ASTNode* term();
 
-int termTail(int lvalue);
+ASTNode* termTail(ASTNode* lvalue);
 
-int power(int value);
+ASTNode* expression();
+
+ASTNode* exprTail(ASTNode* lvalue);
+
+ASTNode* createNumberNode(int value);
+
+ASTNode* createOperatorNode(TokenType type, ASTNode* left, ASTNode* right);
+
+int evaluateAST(ASTNode* node);
+
+int lookupVariable(const char *name);   // Research the value of a variable
+
+void assignVariable(const char *name, int value);  // Assign a value to a variable
 
 void parsePrintStatement();
 

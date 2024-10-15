@@ -23,6 +23,7 @@ typedef enum
     Gt,             // '>'
     Ge,             // '>='
     Ne,             // '!='
+    Printf,
     Eof,            // End of file
     Lparen,         // '('
     Rparen,         // ')'
@@ -43,5 +44,6 @@ Token createToken(TokenType type, const char *value);
 char peek();
 void advance();
 Token getNextToken();
+void ignoreSpaces();
 
 #endif
