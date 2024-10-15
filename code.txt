@@ -1,0 +1,6 @@
+x = 5 + 3
+printf( x )
+y =  x + x + 5
+printf( y )
+y = y * ( 2 + 1 )
+printf( y )

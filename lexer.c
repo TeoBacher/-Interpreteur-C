@@ -19,9 +19,12 @@
 #include <ctype.h>
 #include <string.h>
 #include "parser.h"
+#include "input.h"
 
 const char *input;
 int position = 0;
+int debugMode = 0;
+
 
 // Function that creates the token
 Token createToken(TokenType type, const char *value)
@@ -137,53 +140,82 @@ Token getNextToken() {
 }
 
 
-int main()
-{
-    // Array of test expressions
-    const char* testExpressions[] = {
-        // "2 ^ 3",
-        // "2 ^ 3 ^ 2",
-        // "10 ^ 2",
-        // "5 < 10",
-        // "10 <= 10",
-        // "15 > 10",
-        // "20 >= 20",
-        // "5 != 10",
-        // "(2 + 3) * 2",
-        // "10 - 5 <= 5",
-        // "2 * 3 > 5",
-        // "10 / 2 >= 5",
-        // "10 % 3 != 1",
-        // "printf((2 + 3) * 4 )",
-        "x = 5 + 3",
-        "printf( x )",
-        "y =  x + x + 5",
-        "printf( y )",
-        "y = y * 2",
-        "printf( y )"
-    };
+// int main()
+// {
+//     // Array of test expressions
+//     const char* testExpressions[] = {
+//         // "2 ^ 3",
+//         // "2 ^ 3 ^ 2",
+//         // "10 ^ 2",
+//         // "5 < 10",
+//         // "10 <= 10",
+//         // "15 > 10",
+//         // "20 >= 20",
+//         // "5 != 10",
+//         // "(2 + 3) * 2",
+//         // "10 - 5 <= 5",
+//         // "2 * 3 > 5",
+//         // "10 / 2 >= 5",
+//         // "10 % 3 != 1",
+//         // "printf((2 + 3) * 4 )",
+//         "x = 5 + 3",
+//         "printf( x )",
+//         "y =  x + x + 5",
+//         "printf( y )",
+//         "y = y * 2",
+//         "printf( y )"
+//     };
 
-    // Number of test expressions
-    int numTests = sizeof(testExpressions) / sizeof(testExpressions[0]);
+//     // Number of test expressions
+//     int numTests = sizeof(testExpressions) / sizeof(testExpressions[0]);
 
-    for (int i = 0; i < numTests; i++)
-    {
-        input = testExpressions[i];
-        position = 0;
+//     for (int i = 0; i < numTests; i++)
+//     {
+//         input = testExpressions[i];
+//         position = 0;
 
-        printf("Expression: %s\n", input);
+//         printf("Expression: %s\n", input);
 
-        nextToken();  
+//         nextToken();  
 
+//         if (currentToken.type == Printf) {
+//     printStatement(); 
+//     } 
+//     else {
+//         ASTNode* ast = expression(); 
+//         int result = evaluateAST(ast);
+//         printf("Résultat : %d\n", result);
+//     }
+//     }
+
+//     return 0;
+// }
+
+
+void interpret(const char* inputExpression) {
+    input = inputExpression;
+    position = 0;
+
+    nextToken();  
+    do {
         if (currentToken.type == Printf) {
-    printStatement(); 
-    } 
-    else {
-        ASTNode* ast = expression(); 
-        int result = evaluateAST(ast);
-        printf("Résultat : %d\n", result);
+            printStatement();  
+        } else {
+            expression();  
+        }
+        nextToken();  
+    } while (currentToken.type != Eof);
+}
+
+
+int main(int argc, char *argv[])
+{
+    if (argc > 1 && strcmp(argv[1], "1") == 0) {
+        debugMode = 1;
     }
-    }
+
+    // Appel à la gestion des entrées (fichier ou mode interactif)
+    handleInput();
 
     return 0;
 }
