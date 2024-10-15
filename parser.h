@@ -65,6 +65,6 @@ int lookupVariable(const char *name);   // Research the value of a variable
 
 void  assignVariable(const char *name, VariableType type, void* value);  // Assign a value to a variable
 
-void checkVariableType(VariableType expected, VariableType actual)
+void checkVariableType(VariableType expected, VariableType actual);
 
 #endif
