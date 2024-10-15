@@ -37,7 +37,7 @@ Token createToken(TokenType type, const char *value)
     {
         strncpy(token.value, value, strlen(value) + 1);
     }
-        printf("Creating Token: Type = %d, Value = %s\n", type, value);  // Debug: vérifier le type et la valeur du token
+        printf("Creating Token: Type = %d, Value = %s\n", type, value);  // Debug
 
     return token;
 }
@@ -221,7 +221,6 @@ int main(int argc, char *argv[])
         debugMode = 1;
     }
 
-    // Appel à la gestion des entrées (fichier ou mode interactif)
     handleInput();
 
     return 0;

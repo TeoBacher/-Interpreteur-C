@@ -6,16 +6,7 @@
 #include <string.h>
 #include "lexer.h"
 
-//Token currentToken;
-
-// Symbol table
-typedef struct {
-    char identifier[256];  // Name of the variable
-    int value;             // Value associated with the variable
-} SymbolTableEntry;
-
-extern SymbolTableEntry symbolTable[100]; // Max size of the symbol table
-extern int symbolCount;                   // Variable counter
+Token currentToken;
 
 typedef struct ASTNode {
     TokenType type;            
@@ -56,13 +47,10 @@ ASTNode* createOperatorNode(TokenType type, ASTNode* left, ASTNode* right);
 
 int evaluateAST(ASTNode* node);
 
-int lookupVariable(const char *name);   // Research the value of a variable
+int lookupVariable(const char *name);   
 
-void assignVariable(const char *name, int value);  // Assign a value to a variable
+void assignVariable(const char *name, int value); 
 
-void parsePrintStatement();
 
-int lookupVariable(const char *name);   // Research the value of a variable
-void assignVariable(const char *name, int value);  // Assign a value to a variable
 
 #endif

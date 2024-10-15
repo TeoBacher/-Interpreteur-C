@@ -52,11 +52,11 @@ void handleInput() {
         printf("2. Mode interactif\n");
         printf("Entrez votre choix (1 ou 2): ");
         scanf("%d", &mode);
-        getchar();  // Consommer le retour à la ligne
+        getchar();  
     } while (mode != 1 && mode != 2);
     
     if (mode == 1) {
-        interpretFile("code.txt");  // Remplacer par le nom du fichier
+        interpretFile("code.txt");
     } else if (mode == 2) {
         interactiveMode();
     }
